@@ -1,0 +1,12 @@
+# python's cache files - for 2.x and 3.x versions of python:
+__pycache__/
+*.pyc
+
+# generated meta files:
+/asset_uploader.egg-info/
+
+# output directories:
+/build/
+/dist/
+/docs/build/
+/logs/
