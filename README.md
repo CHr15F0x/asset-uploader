@@ -44,7 +44,7 @@ source ./venv/bin/activate
 ```
 ## Install asset-uploader package and run unit tests
 ```
-cd /asset_uploader/docker/uwsgi_app
+cd asset_uploader/docker/uwsgi_app
 pip3 install -e .
 pip3 install -r ./requirements-dev.txt 
 python3 ./setup.py test
