@@ -16,8 +16,10 @@ class TestViews(TestCase):
     def setUpClass(cls):
         logging.disable(logging.CRITICAL)
 
-    def assertObjectEqual(self, first, second):
-        self.assertEqual(vars(first), vars(second))
+    def assertResponseEqual(self, first, second):
+        self.assertEqual(first.status_int, second.status_int)
+        self.assertEqual(first.status_code, second.status_code)
+        self.assertEqual(first.text, second.text)
 
     _MOCK_PRESIGNED_URL = 'https://pre-signed-url.com/blahs?blah=blah'
     _MOCK_ASSET_ID = '0123456789abcdef0123456789abcdef'
@@ -47,13 +49,13 @@ class TestViews(TestCase):
     @patch('asset_uploader.app.s3.S3.client')
     def test_asset_post_returns_forbidden_if_s3_client_is_none(self, mock_class):
         mock_class.return_value = None
-        self.assertObjectEqual(views.asset_post('whatever'), Responses.forbidden())
+        self.assertResponseEqual(views.asset_post('whatever'), Responses.forbidden())
 
     @patch('asset_uploader.app.s3.S3.client')
     def test_asset_post_returns_not_available_if_generate_presigned_url_fails(self, mock_class):
         mock_class.return_value = MagicMock()
         mock_class.return_value.generate_presigned_url.side_effect = Exception
-        self.assertObjectEqual(views.asset_post('whatever'), Responses.not_found())
+        self.assertResponseEqual(views.asset_post('whatever'), Responses.not_found())
 
     @patch('asset_uploader.app.views.uuid4')
     @patch('asset_uploader.app.s3.S3.client')
@@ -61,8 +63,8 @@ class TestViews(TestCase):
         mock_client_class.return_value = MagicMock()
         mock_client_class.return_value.generate_presigned_url.return_value = TestViews._MOCK_PRESIGNED_URL
         mock_uuid4_class.return_value = UUID(TestViews._MOCK_ASSET_ID)
-        self.assertObjectEqual(views.asset_post('whatever'),
-                               Responses.created(
+        self.assertResponseEqual(views.asset_post('whatever'),
+                                 Responses.created(
                                    {'id': TestViews._MOCK_ASSET_ID, 'upload_url': TestViews._MOCK_PRESIGNED_URL}))
         mock_client_class.return_value.generate_presigned_url.assert_called_once_with(
             ClientMethod='put_object',
@@ -76,27 +78,27 @@ class TestViews(TestCase):
     @patch('asset_uploader.app.s3.S3.client')
     def test_asset_put_returns_forbidden_if_s3_client_is_none(self, mock_class):
         mock_class.return_value = None
-        self.assertObjectEqual(views.asset_put('whatever'), Responses.forbidden())
+        self.assertResponseEqual(views.asset_put('whatever'), Responses.forbidden())
 
     @patch('asset_uploader.app.views._asset_is_available')
     def test_asset_put_returns_not_available_if_asset_not_found(self, mock_class):
         mock_class.return_value = False
-        self.assertObjectEqual(views.asset_put('whatever'), Responses.not_found())
+        self.assertResponseEqual(views.asset_put('whatever'), Responses.not_found())
 
     @patch('asset_uploader.app.views._asset_is_available')
     def test_asset_put_returns_ok_if_asset_found(self, mock_class):
         mock_class.return_value = True
-        self.assertObjectEqual(views.asset_put('whatever'), Responses.ok({'status': 'uploaded'}))
+        self.assertResponseEqual(views.asset_put('whatever'), Responses.ok({'status': 'uploaded'}))
 
     @patch('asset_uploader.app.s3.S3.client')
     def test_asset_get_returns_forbidden_if_s3_client_is_none(self, mock_class):
         mock_class.return_value = None
-        self.assertObjectEqual(views.asset_get('whatever'), Responses.forbidden())
+        self.assertResponseEqual(views.asset_get('whatever'), Responses.forbidden())
 
     @patch('asset_uploader.app.views._asset_is_available')
     def test_asset_get_returns_not_available_if_asset_not_found(self, mock_class):
         mock_class.return_value = False
-        self.assertObjectEqual(views.asset_get('whatever'), Responses.not_found())
+        self.assertResponseEqual(views.asset_get('whatever'), Responses.not_found())
 
     @patch('asset_uploader.app.views._asset_is_available')
     @patch('asset_uploader.app.s3.S3.client')
@@ -106,7 +108,7 @@ class TestViews(TestCase):
         mock_client_class.return_value.generate_presigned_url.side_effect = Exception
         mock_available_class.return_value = True
         mock_request = TestViews._mock_request()
-        self.assertObjectEqual(views.asset_get(mock_request), Responses.not_found())
+        self.assertResponseEqual(views.asset_get(mock_request), Responses.not_found())
 
     @patch('asset_uploader.app.s3.S3.client')
     def test_asset_get_returns_ok_if_generate_presigned_url_succeeds(self, mock_class):
@@ -118,8 +120,8 @@ class TestViews(TestCase):
                                    ('timeout=hello_world', 60), ('timeout=1', 1), ('timeout=100', 100)]:
             type(mock_request).query_string = PropertyMock(return_value=query_str)
 
-            self.assertObjectEqual(views.asset_get(mock_request),
-                                   Responses.ok({'download_url': TestViews._MOCK_PRESIGNED_URL}))
+            self.assertResponseEqual(views.asset_get(mock_request),
+                                     Responses.ok({'download_url': TestViews._MOCK_PRESIGNED_URL}))
 
             mock_class.return_value.generate_presigned_url.assert_called_with(
                 ClientMethod='get_object',
