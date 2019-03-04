@@ -25,7 +25,7 @@ sudo ./make-bundle.sh
 ```
 sudo ./asset-uploader-bundle.run
 ```
-After successful installation you can check is the service is running:
+After successful installation you can check if the service is running:
 ```
 systemctl is-active asset-uploader.service
 ```
@@ -80,5 +80,3 @@ Asset c5be537cefa143a6960c0145951d4e23 content was saved to file
 ```
 ## Tested on
 __Ubuntu 16.04.5__
-
-
