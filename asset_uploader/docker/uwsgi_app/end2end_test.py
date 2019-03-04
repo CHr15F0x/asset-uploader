@@ -15,20 +15,20 @@ import pytest
 pytestmark = pytest.mark.skip("You need to set proper AWS credentials in asset_uploader.app.s3 to run end to end tests")
 
 class TestAssetUploaderEnd2End(TestCase):
-    USE_PSERVE = getenv('END2END_USE_PSERVE', False)
+    SPAWN_PSERVE = getenv('END2END_SPAWN_PSERVE', False)
     SERVER_URL = getenv('END2END_SERVER', 'http://localhost')
     _pserve_proc = None
     _NONEXISTENT_ASSET_ID_URL = SERVER_URL + '/asset/12345678901234567890123456789012'
 
     @classmethod
     def setUpClass(cls):
-        if cls.USE_PSERVE:
+        if cls.SPAWN_PSERVE:
             cls._pserve_proc = Popen(['pserve', 'dev.ini'], stdout=DEVNULL, stderr=DEVNULL)
             sleep(2)
 
     @classmethod
     def tearDownClass(cls):
-        if cls.USE_PSERVE:
+        if cls.SPAWN_PSERVE:
             cls._pserve_proc.terminate()
             cls._pserve_proc.wait()
 
