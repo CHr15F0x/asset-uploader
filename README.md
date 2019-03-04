@@ -80,3 +80,6 @@ Asset c5be537cefa143a6960c0145951d4e23 content was saved to file
 ```
 ## Tested on
 __Ubuntu 16.04.5__
+
+__Arch__
+
