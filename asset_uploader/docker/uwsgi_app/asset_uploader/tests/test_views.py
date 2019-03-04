@@ -19,7 +19,11 @@ class TestViews(TestCase):
     def assertResponseEqual(self, first, second):
         self.assertEqual(first.status_int, second.status_int)
         self.assertEqual(first.status_code, second.status_code)
-        self.assertEqual(first.text, second.text)
+        self.assertEqual(first.content_type, second.content_type)
+        if first.content_type == 'application/json':
+            self.assertDictEqual(first.json_body, second.json_body)
+        else:
+            self.assertEqual(first.text, second.text)
 
     _MOCK_PRESIGNED_URL = 'https://pre-signed-url.com/blahs?blah=blah'
     _MOCK_ASSET_ID = '0123456789abcdef0123456789abcdef'
