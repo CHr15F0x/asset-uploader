@@ -10,7 +10,7 @@ def print_usage_and_exit():
 Usage: download_example.py asset_id
 
 Upload server:
-    http://localhost:8888 or override with UPLOAD_SERVER environment variable
+    http://localhost or override with UPLOAD_SERVER environment variable
 """)
     exit(-1)
 
@@ -19,7 +19,7 @@ def main():
     if len(argv) != 2:
         print_usage_and_exit()
 
-    server_url = getenv('UPLOAD_SERVER', 'http://localhost:8888')
+    server_url = getenv('UPLOAD_SERVER', 'http://localhost')
 
     try:
         asset_id = argv[1]

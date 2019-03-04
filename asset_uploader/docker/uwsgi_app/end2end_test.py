@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skip("You need to set proper AWS credentials in asset_u
 
 class TestAssetUploaderEnd2End(TestCase):
     USE_PSERVE = getenv('END2END_USE_PSERVE', False)
-    SERVER_URL = getenv('END2END_SERVER', 'http://127.0.0.1:8888')
+    SERVER_URL = getenv('END2END_SERVER', 'http://localhost')
     _pserve_proc = None
     _NONEXISTENT_ASSET_ID_URL = SERVER_URL + '/asset/12345678901234567890123456789012'
 
